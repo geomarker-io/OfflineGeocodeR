@@ -56,6 +56,6 @@ gc_call <- function(address) {
                         args = c('exec','gs',
                                  'ruby','/root/geocoder/geocode.rb',
                                  shQuote(address)),
-                        stderr=TRUE,stdout=TRUE)
+                        stderr=FALSE,stdout=TRUE)
   jsonlite::fromJSON(docker_out)
 }
