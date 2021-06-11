@@ -4,7 +4,7 @@
 \alias{start_geocoder_container}
 \title{start geocoding container}
 \usage{
-start_geocoder_container(image_name = "degauss/geocoder_slim")
+start_geocoder_container(image_name = "degauss/geocoder")
 }
 \arguments{
 \item{image_name}{name of geocoding image; can be used to specify the version
