@@ -25,8 +25,9 @@ start_geocoder_container <- function(image_name = 'degauss/geocoder') {
   system2(docker_cmd,
           args = c('run','-it','-d','--name gs',
                    '--entrypoint /bin/bash',
-                   image_name))
-  message('loading address range database...')
+                   image_name),
+          stdout = NULL)
+  message('and loading address range database...')
   invisible(gc_call('3333 Burnet Ave Cincinnati OH 45229'))
 }
 
@@ -37,9 +38,11 @@ stop_geocoder_container <- function() {
   docker_cmd <- find_docker_cmd()
   message('stopping geocoding container...')
   system2(docker_cmd,
-          args = c('stop','gs'))
+          args = c('stop','gs'),
+          stdout = NULL)
   system2(docker_cmd,
-          args = c('rm','gs'))
+          args = c('rm','gs'),
+          stdout = NULL)
 }
 
 #' call a running geocoding container to geocode an address
