@@ -19,7 +19,7 @@ find_docker_cmd <- function() {
 #'   \code{degauss/geocoder_slim:latest}
 #'
 #' @export
-start_geocoder_container <- function(image_name = 'degauss/geocoder') {
+start_geocoder_container <- function(image_name = 'degauss/geocoder:3.0') {
   message('starting geocoding container...')
   docker_cmd <- find_docker_cmd()
   system2(docker_cmd,
