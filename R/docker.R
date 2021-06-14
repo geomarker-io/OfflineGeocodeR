@@ -52,10 +52,27 @@ stop_geocoder_container <- function() {
 #' @importFrom jsonlite fromJSON
 gc_call <- function(address) {
   docker_cmd <- find_docker_cmd()
+
   docker_out <- system2(docker_cmd,
-                        args = c('exec','gs',
-                                 'ruby','/root/geocoder/geocode.rb',
-                                 shQuote(address)),
-                        stderr=FALSE,stdout=TRUE)
-  jsonlite::fromJSON(docker_out)
+    args = c(
+      "exec", "gs",
+      "ruby", "/root/geocoder/geocode.rb",
+      shQuote(address)
+    ),
+    stderr = FALSE,
+    stdout = TRUE
+  )
+
+  out <- jsonlite::fromJSON(docker_out)
+
+  out$fips_county <- NULL
+
+  if (length(out) == 0) {
+    out <- tibble(
+      street = NA, zip = NA, city = NA, state = NA,
+      lat = NA, lon = NA, score = NA, precision = NA
+    )
+  }
+
+  return(out)
 }
