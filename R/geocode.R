@@ -21,5 +21,5 @@ geocode <- function(addresses, ...){
   start_geocoder_container()
   on.exit(stop_geocoder_container())
   message('now geocoding...')
-  CB::mappp(addresses, gc_call, cache=TRUE, cache.name='geocoding_cache', ...)
+  mappp::mappp(addresses, gc_call, cache=TRUE, cache.name='geocoding_cache', ...)
 }

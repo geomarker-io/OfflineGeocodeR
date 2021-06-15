@@ -19,14 +19,15 @@ find_docker_cmd <- function() {
 #'   \code{degauss/geocoder_slim:latest}
 #'
 #' @export
-start_geocoder_container <- function(image_name = 'degauss/geocoder_slim') {
+start_geocoder_container <- function(image_name = 'degauss/geocoder:3.0') {
   message('starting geocoding container...')
   docker_cmd <- find_docker_cmd()
   system2(docker_cmd,
           args = c('run','-it','-d','--name gs',
                    '--entrypoint /bin/bash',
-                   image_name))
-  message('loading address range database...')
+                   image_name),
+          stdout = NULL)
+  message('and loading address range database...')
   invisible(gc_call('3333 Burnet Ave Cincinnati OH 45229'))
 }
 
@@ -37,9 +38,11 @@ stop_geocoder_container <- function() {
   docker_cmd <- find_docker_cmd()
   message('stopping geocoding container...')
   system2(docker_cmd,
-          args = c('stop','gs'))
+          args = c('stop','gs'),
+          stdout = NULL)
   system2(docker_cmd,
-          args = c('rm','gs'))
+          args = c('rm','gs'),
+          stdout = NULL)
 }
 
 #' call a running geocoding container to geocode an address
@@ -52,10 +55,27 @@ stop_geocoder_container <- function() {
 #' @importFrom jsonlite fromJSON
 gc_call <- function(address) {
   docker_cmd <- find_docker_cmd()
+
   docker_out <- system2(docker_cmd,
-                        args = c('exec','gs',
-                                 'ruby','/root/geocoder/geocode.rb',
-                                 shQuote(address)),
-                        stderr=TRUE,stdout=TRUE)
-  jsonlite::fromJSON(docker_out)
+    args = c(
+      "exec", "gs",
+      "ruby", "/root/geocoder/geocode.rb",
+      shQuote(address)
+    ),
+    stderr = FALSE,
+    stdout = TRUE
+  )
+
+  out <- jsonlite::fromJSON(docker_out)
+
+  out$fips_county <- NULL
+
+  if (length(out) == 0) {
+    out <- tibble(
+      street = NA, zip = NA, city = NA, state = NA,
+      lat = NA, lon = NA, score = NA, precision = NA
+    )
+  }
+
+  return(out)
 }
